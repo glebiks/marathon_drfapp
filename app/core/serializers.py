@@ -2,7 +2,13 @@ from rest_framework import serializers
 from .models import *
 
 
-class ToDoSerializer(serializers.ModelSerializer):
+class GlobalTaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ToDo
-        fields = ('id', 'title', 'description', 'completed')
+        model = GlobalTask
+        fields = ('id', 'user', 'title', 'completed')
+
+
+class SubTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: SubTask
+        fields = ('id', 'relate_to', 'title', 'description', 'completed')

@@ -3,11 +3,14 @@ from .views import *
 
 
 urlpatterns = [
-    path('<int:pk>/', DetailToDo.as_view()),
-    path('', ListToDo.as_view()),
-    path('create', CreateToDo.as_view()),
-    path('delete/<int:pk>', DeleteToDo.as_view()),
+    path('tasks/<int:pk>/', DetailGlobalTask.as_view()),
+    path('tasks/', ListGlobalTask.as_view()),
+    
     #token auth
     path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
+
+    #unused
+    path('tasks/create', CreateGlobalTask.as_view()),
+    path('tasks/delete/<int:pk>', DeleteGlobalTask.as_view()),
 ]
