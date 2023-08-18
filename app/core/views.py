@@ -1,38 +1,28 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .serializers import *
-from .models import GlobalTask
+from .models import MainTask
 from .models import SubTask as SubTaskModel
 from .renderers import *
 
 
 # CRUD operaions
 
-# test
-# class SubTask(generics.ListAPIView):
-#     serializer_class = SubTaskSerializer
-
-#     def get_queryset(self):
-#         queryset = SubTaskModel.objects.all()
-#         return queryset
+class ListMainTask(generics.ListAPIView):  # Read
+    queryset = MainTask.objects.all()
+    serializer_class = MainTaskSerializer
 
 
-class ListGlobalTask(generics.ListAPIView):  # Read
-    queryset = GlobalTask.objects.all()
-    serializer_class = GlobalTaskSerializer
-    renderer_classes = (GlobalTasksRenderer, )
+class DetailMainTask(generics.RetrieveAPIView):  # Update
+    queryset = MainTask.objects.all()
+    serializer_class = MainTaskSerializer
 
 
-class DetailGlobalTask(generics.RetrieveAPIView):  # Update
-    queryset = GlobalTask.objects.all()
-    serializer_class = GlobalTaskSerializer
+class CreateMainTask(generics.CreateAPIView):  # Create
+    queryset = MainTask.objects.all()
+    serializer_class = MainTaskSerializer
 
 
-class CreateGlobalTask(generics.CreateAPIView):  # Create
-    queryset = GlobalTask.objects.all()
-    serializer_class = GlobalTaskSerializer
-
-
-class DeleteGlobalTask(generics.CreateAPIView):  # Delete
-    queryset = GlobalTask.objects.all()
-    serializer_class = GlobalTaskSerializer
+class DeleteMainTask(generics.CreateAPIView):  # Delete
+    queryset = MainTask.objects.all()
+    serializer_class = MainTaskSerializer
