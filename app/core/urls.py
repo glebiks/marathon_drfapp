@@ -5,6 +5,10 @@ from .views import *
 urlpatterns = [
     path('tasks/<int:pk>/', DetailMainTask.as_view()),
     path('tasks/', ListMainTask.as_view()),
+
+    #http://localhost:5001/api/v1/tasks/status
+    #http://localhost:5001/api/v1/tasks/1/1
+    
     
     #token auth
     path('auth/', include('djoser.urls')),
