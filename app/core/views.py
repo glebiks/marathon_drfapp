@@ -28,6 +28,10 @@ class ListMainTask(generics.ListAPIView):  # Read
         return queryset
     
 
+class DetailSubTask(generics.RetrieveAPIView):  # Update
+    queryset = MainTask.objects.all()
+    serializer_class = SubTaskSerializer
+
 
 class DetailMainTask(generics.RetrieveAPIView):  # Update
     queryset = MainTask.objects.all()
@@ -39,6 +43,6 @@ class CreateMainTask(generics.CreateAPIView):  # Create
     serializer_class = MainTaskSerializer
 
 
-class DeleteMainTask(generics.CreateAPIView):  # Delete
+class DeleteMainTask(generics.DestroyAPIView):  # Delete
     queryset = MainTask.objects.all()
     serializer_class = MainTaskSerializer
