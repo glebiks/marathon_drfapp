@@ -5,7 +5,6 @@ from .models import *
 class FullNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = FullName
-        # fields = ('full_name')
         fields = '__all__'
 
 

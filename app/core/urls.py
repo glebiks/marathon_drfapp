@@ -15,6 +15,6 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 
     #unused
-    path('tasks/create', CreateMainTask.as_view()),
-    path('tasks/delete/<int:pk>', DeleteMainTask.as_view()),
+    # path('tasks/create', CreateMainTask.as_view()),
+    # path('tasks/delete/<int:pk>', DeleteMainTask.as_view()),
 ]
