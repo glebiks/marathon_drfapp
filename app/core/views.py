@@ -9,6 +9,33 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
+# custom djoser respone
+from djoser.conf import settings
+from djoser import signals, utils
+from django.contrib.auth.tokens import default_token_generator
+from rest_framework import generics, status, views, viewsets
+
+class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
+    """Use this endpoint to obtain user authentication token."""
+
+    serializer_class = settings.SERIALIZERS.token_create
+    permission_classes = settings.PERMISSIONS.token_create
+
+    def _action(self, serializer):
+        token = utils.login_user(self.request, serializer.user)
+        token_serializer_class = settings.SERIALIZERS.token
+        content = {
+            'success': True,
+            'data': {
+                'Token': token_serializer_class(token).data["auth_token"]
+            }
+        }
+        return Response(
+            data=content
+        )
+    
+
+    
 # CRUD operaions
 
 
@@ -20,7 +47,8 @@ class Ready(APIView):
         else: 
             return Response({'success': True, 'data': {"ready": False}})
 
-class ListMainTask(generics.ListAPIView):  # Read
+
+class ListMainTask(generics.ListAPIView): 
     serializer_class = MainTaskSerializer
     renderer_classes = (MainTasksRenderer, )
     
@@ -39,31 +67,25 @@ class SubtaskReady(APIView):
     def get(self, request, pk, **kwargs):
         # Get subtask details by pk
         subtasks = get_list_or_404(SubTask, maintask=pk)
-
         if (kwargs['sub_pk']-1) < len(subtasks):
             subtask = subtasks[kwargs['sub_pk']-1]
             serializer = SubTaskSerializer(subtask)
             return Response({'success': True, 'data': serializer.data})
-        
         return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
     
-
     def post(self, request, pk, **kwargs):
         # change subtask ready
         subtasks = get_list_or_404(SubTask, maintask=pk)
 
         if (kwargs['sub_pk']-1) < len(subtasks):
             subtask = subtasks[kwargs['sub_pk']-1]
-
             subtask.ready = not subtask.ready
             subtask.save()
-
             serializer = SubTaskReadySerializer(subtask)
 
             # изменение статуса глобальной задачи 
             cnt = 0
             rec = MainTask.objects.get(id=pk)
-
             for i in subtasks:
                 if i.ready == False:
                     cnt += 1
@@ -73,40 +95,8 @@ class SubtaskReady(APIView):
             elif cnt > 0 and rec.ready == True:
                 rec.ready = False
                 rec.save()
-                
             return Response({'success': True, 'data': serializer.data})
-        
         return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
-
-
-
-
-
-
-
-
-
-
-# class DetailSubTask(generics.RetrieveAPIView):  # Update
-#     serializer_class = SubTaskSerializer
-#     renderer_classes = (UniversalRenderer, )
-#     queryset = SubTask.objects.all()
-
-    # def get_object(self):
-        # if self.request.user.groups.exists():
-
-        #     if is_inspector(self.request.user):
-        #         return "access denied, only executors can view subtasks"
-            
-        #     if is_executor(self.request.user):
-        #         maintask_id = self.kwargs['pk']
-        #         subtask_id = self.kwargs['sub_pk'] 
-        #         print(maintask_id, subtask_id)
-
-        #         queryset = SubTask.objects.filter(maintask_id=maintask_id, id=subtask_id)
-        #         print(queryset)
-            
-        # return queryset
 
 
 # class CreateMainTask(generics.CreateAPIView):  # Create
