@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework import generics
 from .serializers import *
-from .models import MainTask
+from .models import *
 from .renderers import *
 from django.http import HttpResponse, JsonResponse
 from .decorators import *
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 # CRUD operaions
@@ -23,6 +25,23 @@ class ListMainTask(generics.ListAPIView):  # Read
                 queryset = MainTask.objects.all()
         return queryset
     
+
+class SubtaskReady(APIView):
+    def get(self, request, pk, **kwargs):
+        # Get subtask details by pk
+        subtasks = get_list_or_404(SubTask, maintask=pk)
+
+        if (kwargs['sub_pk']-1) < len(subtasks):
+            subtask = subtasks[kwargs['sub_pk']-1]
+            serializer = SubTaskSerializer(subtask)
+            return Response(serializer.data)
+        
+        return Response({'pk':pk, 'sub_pk':kwargs['sub_pk']})
+    
+    def post(self, request, **kwargs):
+        ...
+
+
 
 class DetailSubTask(generics.RetrieveAPIView):  # Update
     serializer_class = SubTaskSerializer
