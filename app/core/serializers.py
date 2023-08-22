@@ -13,6 +13,11 @@ class SubTaskSerializer(serializers.ModelSerializer):
         model = SubTask
         fields = ('id', 'title', 'description', 'completed', 'maintask')
 
+class SubTaskReadySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubTask
+        fields = ('completed',)
+
 
 class MainTaskSerializer(serializers.ModelSerializer):
     fullname = serializers.CharField(source='fullname.full_name')

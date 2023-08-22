@@ -15,7 +15,6 @@ class ListMainTask(generics.ListAPIView):  # Read
     serializer_class = MainTaskSerializer
     renderer_classes = (MainTasksRenderer, )
     
-
     def get_queryset(self):
         queryset = None
         if self.request.user.groups.exists():
@@ -27,6 +26,7 @@ class ListMainTask(generics.ListAPIView):  # Read
     
 
 class SubtaskReady(APIView):
+
     def get(self, request, pk, **kwargs):
         # Get subtask details by pk
         subtasks = get_list_or_404(SubTask, maintask=pk)
@@ -34,19 +34,39 @@ class SubtaskReady(APIView):
         if (kwargs['sub_pk']-1) < len(subtasks):
             subtask = subtasks[kwargs['sub_pk']-1]
             serializer = SubTaskSerializer(subtask)
-            return Response(serializer.data)
+            return Response({'success': True, 'data': serializer.data})
         
-        return Response({'pk':pk, 'sub_pk':kwargs['sub_pk']})
+        return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
     
-    def post(self, request, **kwargs):
-        ...
+
+    def post(self, request, pk, **kwargs):
+        # change subtask ready
+        subtasks = get_list_or_404(SubTask, maintask=pk)
+
+        if (kwargs['sub_pk']-1) < len(subtasks):
+            subtask = subtasks[kwargs['sub_pk']-1]
+
+            subtask.completed = not subtask.completed
+            subtask.save()
+
+            serializer = SubTaskReadySerializer(subtask)
+            return Response({'success': True, 'data': serializer.data})
+        
+        return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
 
 
 
-class DetailSubTask(generics.RetrieveAPIView):  # Update
-    serializer_class = SubTaskSerializer
-    renderer_classes = (UniversalRenderer, )
-    queryset = SubTask.objects.all()
+
+
+
+
+
+
+
+# class DetailSubTask(generics.RetrieveAPIView):  # Update
+#     serializer_class = SubTaskSerializer
+#     renderer_classes = (UniversalRenderer, )
+#     queryset = SubTask.objects.all()
 
     # def get_object(self):
         # if self.request.user.groups.exists():
