@@ -9,5 +9,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY ./app /app
 
-RUN adduser user
+RUN adduser --uid 1001 user
+RUN chown -R 1001:1001 /app
 USER user
