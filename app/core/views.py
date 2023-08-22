@@ -46,7 +46,7 @@ class SubtaskReady(APIView):
         if (kwargs['sub_pk']-1) < len(subtasks):
             subtask = subtasks[kwargs['sub_pk']-1]
 
-            subtask.completed = not subtask.completed
+            subtask.ready = not subtask.ready
             subtask.save()
 
             serializer = SubTaskReadySerializer(subtask)

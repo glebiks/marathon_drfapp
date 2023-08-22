@@ -31,7 +31,7 @@ class MainTasksRenderer(renderers.JSONRenderer):
             step1 = json.loads(subtasks_temp)
             step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
                                 'description': i['fields']['description'], 
-                                'completed': i['fields']['completed']} for i in step1], ensure_ascii=False)
+                                'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
             if i.id-1 < len(data):
                 data[i.id-1]['subtasks'] = json.loads(step2)
         

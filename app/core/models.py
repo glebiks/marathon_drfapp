@@ -11,18 +11,18 @@ class FullName(models.Model):
 
 
 class Status(models.Model):
-    completed = models.BooleanField(default=False)
+    ready = models.BooleanField(default=False)
 
 
 class MainTask(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=False)
     fullname = models.ForeignKey(FullName, default=1, on_delete=models.CASCADE)
-    completed = models.BooleanField(default=False)
+    ready = models.BooleanField(default=False)
 
 
 class SubTask(models.Model):
     title = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
-    completed = models.BooleanField(default=False)
+    ready = models.BooleanField(default=False)
     maintask = models.ForeignKey(MainTask, on_delete=models.CASCADE)

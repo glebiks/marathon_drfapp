@@ -11,12 +11,12 @@ class FullNameSerializer(serializers.ModelSerializer):
 class SubTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubTask
-        fields = ('id', 'title', 'description', 'completed', 'maintask')
+        fields = ('id', 'title', 'description', 'ready', 'maintask')
 
 class SubTaskReadySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubTask
-        fields = ('completed',)
+        fields = ('ready',)
 
 
 class MainTaskSerializer(serializers.ModelSerializer):
@@ -24,5 +24,5 @@ class MainTaskSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MainTask
-        fields = ('id', 'user', 'title', 'fullname', 'completed')
+        fields = ('id', 'user', 'title', 'fullname', 'ready')
     
