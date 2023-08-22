@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('tasks/status/', Ready.as_view()),
-    path('tasks/<int:pk>/<int:sub_pk>/', SubtaskReady.as_view()),
+    path('tasks/<int:pk>/<int:sub_pk>', SubtaskReady.as_view()),
     path('tasks/', ListMainTask.as_view()),
 
     #http://localhost:5001/api/v1/tasks/status

@@ -59,6 +59,21 @@ class SubtaskReady(APIView):
             subtask.save()
 
             serializer = SubTaskReadySerializer(subtask)
+
+            # изменение статуса глобальной задачи 
+            cnt = 0
+            rec = MainTask.objects.get(id=pk)
+
+            for i in subtasks:
+                if i.ready == False:
+                    cnt += 1
+            if cnt == 0:
+                rec.ready = True
+                rec.save()
+            elif cnt > 0 and rec.ready == True:
+                rec.ready = False
+                rec.save()
+                
             return Response({'success': True, 'data': serializer.data})
         
         return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
