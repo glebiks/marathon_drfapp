@@ -11,6 +11,15 @@ from rest_framework.response import Response
 
 # CRUD operaions
 
+
+class Ready(APIView):
+    def get(self, request, **kwargs):
+        maintasks = MainTask.objects.all()
+        if maintasks.filter(ready=False).count() == 0:
+            return Response({'success': True, 'data': {"ready": True}})
+        else: 
+            return Response({'success': True, 'data': {"ready": False}})
+
 class ListMainTask(generics.ListAPIView):  # Read
     serializer_class = MainTaskSerializer
     renderer_classes = (MainTasksRenderer, )
