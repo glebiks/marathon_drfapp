@@ -25,13 +25,15 @@ class MainTasksRenderer(renderers.JSONRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
 
+        # добавляем к каждой главной задаче список подзадач при ответе
         for i in MainTask.objects.all():
             subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=i.id))
             step1 = json.loads(subtasks_temp)
             step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
                                 'description': i['fields']['description'], 
-                                'completed': i['fields']['completed']} for i in step1])
-            data[i.id-1]['subtasks'] = json.loads(step2)
+                                'completed': i['fields']['completed']} for i in step1], ensure_ascii=False)
+            if i.id-1 < len(data):
+                data[i.id-1]['subtasks'] = json.loads(step2)
         
         response = ''
         if 'ErrorDetail' in str(data):
@@ -40,3 +42,4 @@ class MainTasksRenderer(renderers.JSONRenderer):
             response = json.dumps({'success': True, 'data': data}, ensure_ascii=False)
 
         return response
+    

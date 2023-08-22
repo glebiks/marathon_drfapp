@@ -27,35 +27,23 @@ class ListMainTask(generics.ListAPIView):  # Read
 class DetailSubTask(generics.RetrieveAPIView):  # Update
     serializer_class = SubTaskSerializer
     renderer_classes = (UniversalRenderer, )
-    # queryset = MainTask.objects.all()
+    queryset = SubTask.objects.all()
 
-    def get_queryset(self):
-        if self.request.user.groups.exists():
+    # def get_object(self):
+        # if self.request.user.groups.exists():
 
-            if is_inspector(self.request.user):
-                return "access denied"
+        #     if is_inspector(self.request.user):
+        #         return "access denied, only executors can view subtasks"
             
-            if is_executor(self.request.user):
+        #     if is_executor(self.request.user):
+        #         maintask_id = self.kwargs['pk']
+        #         subtask_id = self.kwargs['sub_pk'] 
+        #         print(maintask_id, subtask_id)
 
-                maintask_id = self.kwargs['pk']
-                subtask_id = self.kwargs['sub_pk'] 
-
-                subtasks = SubTask.objects.filter(maintask_id=maintask_id, id=subtask_id)
-
-                # print(subtasks.all())
-                # print(subtasks.filter(id=subtask_id))
-                queryset = subtasks
-                
+        #         queryset = SubTask.objects.filter(maintask_id=maintask_id, id=subtask_id)
+        #         print(queryset)
             
-            
-        return queryset
-
-
-
-class DetailMainTask(generics.RetrieveAPIView):  # Update
-    queryset = MainTask.objects.all()
-    serializer_class = MainTaskSerializer
-    renderer_classes = (UniversalRenderer, )
+        # return queryset
 
 
 # class CreateMainTask(generics.CreateAPIView):  # Create
