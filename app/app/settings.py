@@ -135,6 +135,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    # "NON_FIELD_ERRORS_KEY": "non_field_errors",
+
+    'EXCEPTION_HANDLER': 'core.serializers.custom_exception_handler',
+
     'DEFAULT_RENDERER_CLASSES':[
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer'

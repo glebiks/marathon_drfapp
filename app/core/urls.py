@@ -1,6 +1,6 @@
 # urls core
 from django.urls import path, include, re_path
-from .views import *
+from .views import Ready, SubtaskReady, ListMainTask, CustomTokenCreateView
 
 
 urlpatterns = [

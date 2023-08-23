@@ -1,25 +1,29 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework import generics
-from .serializers import *
-from .models import *
-from .renderers import *
+from .models import MainTask, SubTask, Status
+from .renderers import MainTasksRenderer, UniversalRenderer
 from django.http import HttpResponse, JsonResponse
-from .decorators import *
+from .decorators import is_executor, is_inspector
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .serializers import TokenCreateSerializer, MainTaskSerializer, SubTaskSerializer, SubTaskReadySerializer   
+
+
 
 
 # custom djoser respone
 from djoser.conf import settings
-from djoser import signals, utils
-from django.contrib.auth.tokens import default_token_generator
-from rest_framework import generics, status, views, viewsets
+from djoser import utils
+from rest_framework import generics, status, permissions
 
+
+# new
 class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
-    """Use this endpoint to obtain user authentication token."""
-
-    serializer_class = settings.SERIALIZERS.token_create
-    permission_classes = settings.PERMISSIONS.token_create
+    """
+    Use this endpoint to obtain user authentication token.
+    """
+    serializer_class = TokenCreateSerializer
+    permission_classes = [permissions.AllowAny]
 
     def _action(self, serializer):
         token = utils.login_user(self.request, serializer.user)
@@ -27,15 +31,17 @@ class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
         content = {
             'success': True,
             'data': {
-                'Token': token_serializer_class(token).data["auth_token"]
+                'token': token_serializer_class(token).data["auth_token"],
+                'role': self.request.user.groups.first(),
             }
         }
         return Response(
-            data=content
+            data=content,
+            status=status.HTTP_200_OK,
         )
     
 
-    
+
 # CRUD operaions
 
 
