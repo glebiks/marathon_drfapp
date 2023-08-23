@@ -35,28 +35,14 @@ from djoser import constants
 
 from django.utils.translation import gettext_lazy as _
 
-class Messages:
-    # INVALID_CREDENTIALS_ERROR = _(f"'success': {False}, 'error': 'Unable to log in with provided credentials.'")
-    INVALID_CREDENTIALS_ERROR = _("Unable to log in with provided credentials.")
-    INACTIVE_ACCOUNT_ERROR = _("User account is disabled.")
-    INVALID_TOKEN_ERROR = _("Invalid token for given user.")
-    INVALID_UID_ERROR = _("Invalid user id or user doesn't exist.")
-    STALE_TOKEN_ERROR = _("Stale token for given user.")
-    PASSWORD_MISMATCH_ERROR = _("The two password fields didn't match.")
-    USERNAME_MISMATCH_ERROR = _("The two {0} fields didn't match.")
-    INVALID_PASSWORD_ERROR = _("Invalid password.")
-    EMAIL_NOT_FOUND = _("User with given email does not exist.")
-    CANNOT_CREATE_USER_ERROR = _("Unable to create account.")
-
-
 class TokenCreateSerializer(serializers.Serializer):
     password = serializers.CharField(
         required=False, style={'input_type': 'password'}
     )
 
     default_error_messages = {
-        'invalid_credentials': Messages.INVALID_CREDENTIALS_ERROR,
-        'inactive_account': Messages.INACTIVE_ACCOUNT_ERROR,
+        'invalid_credentials': constants.Messages.INVALID_CREDENTIALS_ERROR,
+        'inactive_account': constants.Messages.INACTIVE_ACCOUNT_ERROR,
     }
 
     def __init__(self, *args, **kwargs):
@@ -79,7 +65,6 @@ class TokenCreateSerializer(serializers.Serializer):
 
     def _validate_user_exists(self, user):
         if not user:
-            # self.fail('invalid_credentials')
             raise serializers.ValidationError({
                 'success': False,
                 'message': 'invalid_credentials'
@@ -88,7 +73,10 @@ class TokenCreateSerializer(serializers.Serializer):
 
     def _validate_user_is_active(self, user):
         if not user.is_active:
-            self.fail('inactive_account')
+            raise serializers.ValidationError({
+                'success': False,
+                'message': 'inactive_account'
+            })
             
 
 
