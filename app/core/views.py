@@ -103,27 +103,27 @@ class SubtaskReady(APIView):
                 rec.save()
             
             # возвращаем главную задачу 
-            # from django.core import serializers
-            # import json
-            # from django.db.models import Q
+            from django.core import serializers
+            import json
+            from django.db.models import Q
 
 
-            # # подготавливаем данные для поля subtasks
-            # subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=rec.pk))
-            # step1 = json.loads(subtasks_temp)
-            # step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
-            #                     'description': i['fields']['description'], 
-            #                     'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
+            # подготавливаем данные для поля subtasks
+            subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=rec.pk))
+            step1 = json.loads(subtasks_temp)
+            step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
+                                'description': i['fields']['description'], 
+                                'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
             
-            # # подготавливаем данные основной задачи
-            # main_task_ser = MainTaskSerializer(rec)
-            # temp = json.dumps(main_task_ser.data, ensure_ascii=False)
-            # temp = json.loads(temp)
-            # temp['phone'] = rec.user.username
-            # temp['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=rec.id) and Q(ready=True)))
-            # temp['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=rec.id))
-            # temp['subtasks'] = json.loads(step2)
+            # подготавливаем данные основной задачи
+            main_task_ser = MainTaskSerializer(rec)
+            temp = json.dumps(main_task_ser.data, ensure_ascii=False)
+            temp = json.loads(temp)
+            temp['phone'] = rec.user.username
+            temp['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=rec.id) and Q(ready=True)))
+            temp['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=rec.id))
+            temp['subtasks'] = json.loads(step2)
 
-            # return Response({'success': True, 'data': temp})
-            return Response({'success': True, 'data': serializer.data})
+            return Response({'success': True, 'data': temp})
+            # return Response({'success': True, 'data': serializer.data})
         return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
