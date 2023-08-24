@@ -57,15 +57,16 @@ class Ready(APIView):
 class ListMainTask(generics.ListAPIView): 
     serializer_class = MainTaskSerializer
     renderer_classes = (MainTasksRenderer, )
+    queryset = MainTask.objects.all()
     
-    def get_queryset(self):
-        queryset = None
-        if self.request.user.groups.exists():
-            if is_executor(self.request.user):
-                queryset = MainTask.objects.filter(user=self.request.user)
-            if is_inspector(self.request.user):
-                queryset = MainTask.objects.all()
-        return queryset
+    # def get_queryset(self):
+    #     queryset = None
+    #     if self.request.user.groups.exists():
+    #         if is_executor(self.request.user):
+    #             queryset = MainTask.objects.filter(user=self.request.user)
+    #         if is_inspector(self.request.user):
+    #             queryset = MainTask.objects.all()
+    #     return queryset
     
 
 class SubtaskReady(APIView):

@@ -6,6 +6,7 @@ from .models import *
 from django.db.models import Q
 from .decorators import is_inspector, is_executor
 
+
 class UniversalRenderer(renderers.JSONRenderer):
 
     charset = 'utf-8'
@@ -27,19 +28,23 @@ class MainTasksRenderer(renderers.JSONRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
 
+        request = renderer_context['request']
+
+        i_user = request.user.id
+
         # добавляем к каждой главной задаче список подзадач при ответе
         # проходить не по всем задачам а по задачам которые тебе назначены, если ты инспектор то по всем
-        current_user_id = data[0]['user']
 
-        if User.objects.get(id = current_user_id).groups.exists():
+        if User.objects.get(id = i_user).groups.exists():
 
-            if is_inspector(User.objects.get(id = current_user_id)):
+            if is_inspector(User.objects.get(id = i_user)):
                 for i in MainTask.objects.all():
                     subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=i.id))
                     step1 = json.loads(subtasks_temp)
                     step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
                                         'description': i['fields']['description'], 
                                         'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
+                    
                     if i.id-1 < len(data):
                         data[i.id-1]['phone'] = i.user.username
                         data[i.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=i.id) and Q(ready=True)))
@@ -48,19 +53,23 @@ class MainTasksRenderer(renderers.JSONRenderer):
 
 
             # исполнитель видит только свои задачи 
-            if is_executor(User.objects.get(id = current_user_id)):
-                for i in MainTask.objects.filter(user = current_user_id):
-                    subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=i.id))
+            if is_executor(User.objects.get(id = i_user)):
+                for specific_main_task in MainTask.objects.filter(user = i_user):
+
+                    # конкретные задачи
+                    subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=specific_main_task.id))
                     step1 = json.loads(subtasks_temp)
-                    step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
-                                        'description': i['fields']['description'], 
-                                        'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
-                    if i.id-1 < len(data):
-                        data[i.id-1]['phone'] = i.user.username
-                        data[i.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=i.id) and Q(ready=True)))
-                        data[i.id-1]['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=i.id))
-                        data[i.id-1]['subtasks'] = json.loads(step2)
-                        
+                    step2 = json.dumps([{'id':i['pk'], 
+                                         'title': i['fields']['title'], 
+                                         'description': i['fields']['description'], 
+                                         'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
+                    
+                    if specific_main_task.id-1 < len(data):
+                        data[specific_main_task.id-1]['phone'] = specific_main_task.user.username
+                        data[specific_main_task.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=specific_main_task.id) and Q(ready=True)))
+                        data[specific_main_task.id-1]['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=specific_main_task.id))
+                        data[specific_main_task.id-1]['subtasks'] = json.loads(step2)
+
         
         response = ''
         if 'ErrorDetail' in str(data):
