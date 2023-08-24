@@ -33,7 +33,10 @@ class MainTasksRenderer(renderers.JSONRenderer):
                                 'description': i['fields']['description'], 
                                 'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
             if i.id-1 < len(data):
+                data[i.id-1]['phone'] = i.user.username
                 data[i.id-1]['subtasks'] = json.loads(step2)
+                
+            
         
         response = ''
         if 'ErrorDetail' in str(data):
