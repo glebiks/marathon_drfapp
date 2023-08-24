@@ -31,7 +31,8 @@ class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
             'success': True,
             'data': {
                 'token': token_serializer_class(token).data["auth_token"],
-                'role': str(User.objects.get(username=self.request.POST['username']).groups.first()),
+                'role': str(User.objects.get(username=self.request.data["username"]).groups.first())
+                # 'role': str(User.objects.get(username=self.request.POST['username']).groups.first()),
             }
         }
         return Response(
