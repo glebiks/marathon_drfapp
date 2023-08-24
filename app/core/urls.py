@@ -10,7 +10,7 @@ urlpatterns = [
     
     
     #token auth
-    path('auth/token/login', CustomTokenCreateView.as_view()),
+    path('auth/token/login/', CustomTokenCreateView.as_view()),
     path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 
