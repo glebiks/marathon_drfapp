@@ -35,7 +35,7 @@ class MainTasksRenderer(renderers.JSONRenderer):
                                 'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
             if i.id-1 < len(data):
                 data[i.id-1]['phone'] = i.user.username
-                data[i.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=i.id) | Q(ready=True)))
+                data[i.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=i.id) and Q(ready=True)))
                 data[i.id-1]['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=i.id))
                 data[i.id-1]['subtasks'] = json.loads(step2)
             
