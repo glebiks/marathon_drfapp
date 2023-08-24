@@ -7,8 +7,7 @@ from .decorators import is_executor, is_inspector
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import TokenCreateSerializer, MainTaskSerializer, SubTaskSerializer, SubTaskReadySerializer   
-
-
+from django.contrib.auth.models import Group, User
 
 
 # custom djoser respone
@@ -32,7 +31,7 @@ class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
             'success': True,
             'data': {
                 'token': token_serializer_class(token).data["auth_token"],
-                'role': self.request.user.groups.first(),
+                'role': str(User.objects.get(username=self.request.POST['username']).groups.first()),
             }
         }
         return Response(
