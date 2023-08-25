@@ -31,8 +31,9 @@ class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
             'success': True,
             'data': {
                 'token': token_serializer_class(token).data["auth_token"],
-                'role': str(User.objects.get(username=self.request.data["username"]).groups.first())
+                'role': str(User.objects.get(username=self.request.data["username"]).groups.first()),
                 # 'role': str(User.objects.get(username=self.request.POST['username']).groups.first()),
+                'user_id': User.objects.get(username=self.request.data["username"]).pk,
             }
         }
         return Response(
@@ -70,29 +71,33 @@ class ListMainTask(generics.ListAPIView):
 class SubtaskReady(APIView):
 
     def get(self, request, pk, **kwargs):
-        subtasks = get_list_or_404(SubTask, maintask=pk)
-        if (kwargs['sub_pk']-1) < len(subtasks):
-            subtask = subtasks[kwargs['sub_pk']-1]
+        # subtasks = get_list_or_404(SubTask, maintask=pk)
+        try:
+            subtask_temp = SubTask.objects.filter(maintask_id = pk)
+            subtask = subtask_temp.get(pk=kwargs['sub_pk'])
             serializer = SubTaskSerializer(subtask)
             return Response({'success': True, 'data': serializer.data})
-        return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
-    
+        except:
+            return Response({"success": False, 
+                            "message": f"Subtask with {kwargs['sub_pk']} id does not exist in this main task"})
+        # return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
+
     def post(self, request, pk, **kwargs):
         # change subtask ready
-        subtasks = get_list_or_404(SubTask, maintask=pk)
-
-        if (kwargs['sub_pk']-1) < len(subtasks):
-            subtask = subtasks[kwargs['sub_pk']-1]
+        # subtasks = get_list_or_404(SubTask, maintask=pk)
+        try:
+            subtasks_temp = SubTask.objects.filter(maintask_id = pk)
+            subtask = subtasks_temp.get(pk=kwargs['sub_pk'])
             subtask.ready = not subtask.ready
             subtask.save()
-            serializer = SubTaskReadySerializer(subtask)
+            # serializer = SubTaskReadySerializer(subtask)
 
             # изменение статуса глобальной задачи 
             cnt = 0
             rec = MainTask.objects.get(id=pk)
 
 
-            for i in subtasks:
+            for i in subtasks_temp:
                 if i.ready == False:
                     cnt += 1
             if cnt == 0:
@@ -129,5 +134,9 @@ class SubtaskReady(APIView):
             temp['subtasks'] = json.loads(step2)
 
             return Response({'success': True, 'data': temp})
-            # return Response({'success': True, 'data': serializer.data})
-        return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
+        # return Response({'success': True, 'data': serializer.data})
+        # return Response({'success': False, 'data': {'pk':pk, 'sub_pk':kwargs['sub_pk']}})
+
+        except:
+            return Response({"success": False, 
+                            "message": f"Subtask with {kwargs['sub_pk']} id does not exist in this main task"})
