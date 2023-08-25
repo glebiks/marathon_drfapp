@@ -18,6 +18,9 @@ class MainTask(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=False)
     fullname = models.ForeignKey(FullName, default=1, on_delete=models.CASCADE)
+    completed_tasks_num = models.IntegerField(blank=True, default=0)
+    all_tasks_num = models.IntegerField(blank=True, default=0)
+    phone = models.CharField(max_length=16, default="+79999999999")
     ready = models.BooleanField(default=False)
 
 

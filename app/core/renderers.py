@@ -39,6 +39,14 @@ class MainTasksRenderer(renderers.JSONRenderer):
 
             if is_inspector(User.objects.get(id = i_user)):
                 for i in MainTask.objects.all():
+
+                    # кол-во задач и номер
+                    i.phone = i.user.username
+                    i.all_tasks_num = len(SubTask.objects.filter(maintask_id=i.id))
+                    tmp = SubTask.objects.filter(maintask_id = i.id)
+                    i.completed_tasks_num = len(tmp.filter(ready=True))
+                    i.save()
+
                     subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=i.id))
                     step1 = json.loads(subtasks_temp)
                     step2 = json.dumps([{'id':i['pk'], 'title': i['fields']['title'], 
@@ -46,15 +54,19 @@ class MainTasksRenderer(renderers.JSONRenderer):
                                         'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
                     
                     if i.id-1 < len(data):
-                        data[i.id-1]['phone'] = i.user.username
-                        data[i.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=i.id) and Q(ready=True)))
-                        data[i.id-1]['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=i.id))
                         data[i.id-1]['subtasks'] = json.loads(step2)
 
 
             # исполнитель видит только свои задачи 
             if is_executor(User.objects.get(id = i_user)):
                 for specific_main_task in MainTask.objects.filter(user = i_user):
+
+                    # кол-во задач и номер
+                    specific_main_task.phone = specific_main_task.user.username
+                    specific_main_task.all_tasks_num = len(SubTask.objects.filter(maintask_id=specific_main_task.id))
+                    tmp = SubTask.objects.filter(maintask_id = specific_main_task.id)
+                    specific_main_task.completed_tasks_num = len(tmp.filter(ready=True))
+                    specific_main_task.save()
 
                     # конкретные задачи
                     subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=specific_main_task.id))
@@ -65,9 +77,6 @@ class MainTasksRenderer(renderers.JSONRenderer):
                                          'ready': i['fields']['ready']} for i in step1], ensure_ascii=False)
                     
                     if specific_main_task.id-1 < len(data):
-                        data[specific_main_task.id-1]['phone'] = specific_main_task.user.username
-                        data[specific_main_task.id-1]['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=specific_main_task.id) and Q(ready=True)))
-                        data[specific_main_task.id-1]['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=specific_main_task.id))
                         data[specific_main_task.id-1]['subtasks'] = json.loads(step2)
 
         

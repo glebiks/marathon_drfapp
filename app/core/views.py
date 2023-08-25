@@ -41,8 +41,6 @@ class CustomTokenCreateView(utils.ActionViewMixin, generics.GenericAPIView):
         )
     
 
-
-
 # global status view
 
 class Ready(APIView):
@@ -72,7 +70,6 @@ class ListMainTask(generics.ListAPIView):
 class SubtaskReady(APIView):
 
     def get(self, request, pk, **kwargs):
-        # Get subtask details by pk
         subtasks = get_list_or_404(SubTask, maintask=pk)
         if (kwargs['sub_pk']-1) < len(subtasks):
             subtask = subtasks[kwargs['sub_pk']-1]
@@ -93,6 +90,8 @@ class SubtaskReady(APIView):
             # изменение статуса глобальной задачи 
             cnt = 0
             rec = MainTask.objects.get(id=pk)
+
+
             for i in subtasks:
                 if i.ready == False:
                     cnt += 1
@@ -108,6 +107,13 @@ class SubtaskReady(APIView):
             import json
             from django.db.models import Q
 
+            # кол-во задач и номер
+            rec.all_tasks_num = len(SubTask.objects.filter(maintask_id=rec.id))
+            rec.phone = rec.user.username
+            rec.all_tasks_num = len(SubTask.objects.filter(maintask_id=rec.id))
+            tmp = SubTask.objects.filter(maintask_id = rec.id)
+            rec.completed_tasks_num = len(tmp.filter(ready=True))
+            rec.save()
 
             # подготавливаем данные для поля subtasks
             subtasks_temp = serializers.serialize('json', SubTask.objects.filter(maintask_id=rec.pk))
@@ -120,9 +126,6 @@ class SubtaskReady(APIView):
             main_task_ser = MainTaskSerializer(rec)
             temp = json.dumps(main_task_ser.data, ensure_ascii=False)
             temp = json.loads(temp)
-            temp['phone'] = rec.user.username
-            temp['completed_tasks_num'] = len(SubTask.objects.filter(Q(maintask_id=rec.id) and Q(ready=True)))
-            temp['all_tasks_num'] = len(SubTask.objects.filter(maintask_id=rec.id))
             temp['subtasks'] = json.loads(step2)
 
             return Response({'success': True, 'data': temp})
